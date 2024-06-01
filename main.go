@@ -1,25 +1,12 @@
 package main
 
 import (
-    "net/http"
-    "github.com/gin-gonic/gin"
+    "myapi/database"
+    "myapi/routes"
 )
 
 func main() {
-    r := gin.Default()
-
-
-    r.GET("/", func(c *gin.Context) {
-        c.JSON(http.StatusOK, gin.H{
-            "message": "Babilandia",
-        })
-    })
-
-    r.GET("/ping", func(c *gin.Context) {
-        c.JSON(http.StatusOK, gin.H{
-            "message": "pong",
-        })
-    })
-
+    database.ConnectDatabase()
+    r := routes.SetupRouter()
     r.Run(":8080")
 }
