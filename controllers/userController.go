@@ -9,9 +9,14 @@ import (
 
 func FindUsers(c *gin.Context) {
     var users []models.User
-    database.DB.Find(&users)
+
+    if result := database.DB.Find(&users); result.Error != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+        return
+    }
     c.JSON(http.StatusOK, gin.H{"data": users})
 }
+
 
 func FindUser(c *gin.Context) {
     var user models.User
