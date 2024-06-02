@@ -41,7 +41,11 @@ func CreateUser(c *gin.Context) {
 func UpdateUser(c *gin.Context) {
     var user models.User
     if err := database.DB.Where("id = ?", c.Param("id")).First(&user).Error; err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "User not found!"})
+        if err == gorm.ErrRecordNotFound {
+            c.JSON(http.StatusNotFound, gin.H{"error": "User not found!"})
+        } else {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        }
         return
     }
 
@@ -51,7 +55,11 @@ func UpdateUser(c *gin.Context) {
         return
     }
 
-    database.DB.Model(&user).Updates(input)
+    if err := database.DB.Model(&user).Updates(input).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
     c.JSON(http.StatusOK, gin.H{"data": user})
 }
 
